@@ -1,0 +1,23 @@
+parameters:
+  test: "hoge"
+
+shared:
+  image: node:18
+jobs:
+  # fail -> success -> restart -> success
+  a:
+    requires: [ ~commit ]
+    steps:
+      - main: if [ $(meta get parameters.test.value) = "hoge" ] ; then echo "失敗させる"; exit 1; fi
+  b:
+    requires: [ ~commit ]
+    steps:
+      - sleep: sleep 20
+  c:
+    requires: [ ~commit ]
+    steps:
+      - main: sleep 90
+  target:
+    requires: [ a, b, c ]
+    steps:
+      - main: echo "This is test"
